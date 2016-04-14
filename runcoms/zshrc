@@ -14,7 +14,9 @@ fi
 
 # Customize to your needs...
 
-screenfetch -D 'arch'
+if [[ -x "/usr/bin/screenfetch" ]]; then
+    screenfetch
+fi
 
 if [[ -x "/usr/bin/ponysay" ]]; then
     ponysay -b unicode -q
