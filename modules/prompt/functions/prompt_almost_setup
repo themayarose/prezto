@@ -100,7 +100,7 @@ function prompt_almost_setup {
     local unstaged_format="${_C[2]}✖%f"
     local staged_format="${_C[5]}✔%f"
 
-    if ( $SSH_TTY ); then
+    if [[ -n "$SSH_TTY" ]]; then
         host='%M'
     else
         host='%m'

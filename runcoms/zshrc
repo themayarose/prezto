@@ -5,6 +5,8 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
+source $HOME/.commonrc
+
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
@@ -12,4 +14,8 @@ fi
 
 # Customize to your needs...
 
-source $HOME/.commonrc
+screenfetch -D 'arch'
+
+if [[ -x "/usr/bin/ponysay" ]]; then
+    ponysay -b unicode -q
+fi
