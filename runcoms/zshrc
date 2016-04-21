@@ -14,10 +14,10 @@ fi
 
 # Customize to your needs...
 
-if [[ -x "/usr/bin/screenfetch" ]]; then
+if [[ -x $(which screenfetch) ]]; then
     screenfetch
 fi
 
-if [[ -x "/usr/bin/ponysay" ]]; then
+if [[ -x $(which ponysay) ]]; then
     ponysay -b unicode -q
 fi
