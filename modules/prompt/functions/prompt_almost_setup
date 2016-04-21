@@ -147,7 +147,7 @@ function prompt_almost_setup {
 }
 
 function _set_prompt {
-    left_prompt="${_C[6]}→%f ${_C[4]}%n%f at ${_C[5]}$host%f in ${_C[1]}${_prompt_sorin_pwd}%f"
+    left_prompt="${_C[6]}%B→%b%f ${_C[4]}%n%f at ${_C[5]}$host%f in ${_C[1]}${_prompt_sorin_pwd}%f"
 
     local zero='%([BSUbfksu]|([FBK]|){*})'
     local left_width=${#${(S%%)left_prompt//$~zero/}}
