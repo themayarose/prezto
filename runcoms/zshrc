@@ -5,7 +5,13 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
-source $HOME/.commonrc
+if [[ -s "/etc/profile.d/vte.sh" ]]; then
+    source /etc/profile.d/vte.sh
+fi
+
+if [[ -s "$HOME/.commonrc" ]]; then
+    source $HOME/.commonrc
+fi
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
@@ -21,3 +27,5 @@ fi
 if [[ -x $(which ponysay) ]]; then
     ponysay -b unicode -q
 fi
+
+
