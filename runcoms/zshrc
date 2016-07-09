@@ -28,4 +28,7 @@ if [[ -x $(which ponysay) ]]; then
     ponysay -b unicode -q
 fi
 
+if [[ -s "$HOME/.commonrc" ]]; then
+    source $HOME/.commonrc
+fi
 
