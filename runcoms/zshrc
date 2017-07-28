@@ -34,3 +34,10 @@ fi
 
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+if [[ -n "$NVIM_LISTEN_ADDRESS" && -x "$(which nvr)" ]]; then
+    export VISUAL="nvr -l --remote-wait"
+    export EDITOR="nvr -l --remote-wait"
+
+    alias nvim="nvr -l --remote"
+fi
