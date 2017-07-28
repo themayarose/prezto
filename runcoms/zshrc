@@ -36,8 +36,10 @@ fi
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 if [[ -n "$NVIM_LISTEN_ADDRESS" && -x "$(which nvr)" ]]; then
-    export VISUAL="nvr -l --remote-wait"
-    export EDITOR="nvr -l --remote-wait"
+    local sp_or_wp="if winnr('\$') == 1 | split | else | wincmd p | endif"
 
-    alias nvim="nvr -l --remote"
+    export VISUAL="nvr -cc \"$sp_or_wp\" --remote-wait"
+    export EDITOR="nvr -cc \"$sp_or_wp\" --remote-wait"
+
+    alias nvim="nvr -cc \"$sp_or_wp\" --remote"
 fi
