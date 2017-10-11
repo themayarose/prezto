@@ -43,3 +43,5 @@ if [[ -n "$NVIM_LISTEN_ADDRESS" && -x "$(which nvr)" ]]; then
 
     alias nvim="nvr -cc \"$sp_or_wp\" --remote"
 fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
