@@ -20,7 +20,9 @@ fi
 
 # Customize to your needs...
 
-if [[ -x $(which screenfetch) ]]; then
+if [[ -x $(which neofetch) ]]; then
+    neofetch
+elif [[ -x $(which screenfetch) ]]; then
     screenfetch
 fi
 
