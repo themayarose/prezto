@@ -5,6 +5,11 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
+if [[ -x $(which tmux) && -z "$TMUX" ]]; then
+    tmux attach || tmux new
+    exit 0
+fi
+
 if [[ -s "/etc/profile.d/vte.sh" ]]; then
     source /etc/profile.d/vte.sh
 fi
@@ -45,3 +50,4 @@ if [[ -n "$NVIM_LISTEN_ADDRESS" && -x "$(which nvr)" ]]; then
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
