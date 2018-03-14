@@ -5,7 +5,7 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
-if [[ -x $(which tmux) && -z "$TMUX" ]]; then
+if [[ -x $(which tmux 2>/dev/null) && -z "$TMUX" ]]; then
     tmux attach || tmux new
     exit 0
 fi
@@ -25,13 +25,13 @@ fi
 
 # Customize to your needs...
 
-if [[ -x $(which neofetch) ]]; then
+if [[ -x $(which neofetch 2>/dev/null) ]]; then
     neofetch
-elif [[ -x $(which screenfetch) ]]; then
+elif [[ -x $(which screenfetch 2>/dev/null) ]]; then
     screenfetch
 fi
 
-if [[ -x $(which ponysay) ]]; then
+if [[ -x $(which ponysay 2>/dev/null) ]]; then
     ponysay -b unicode -q
 fi
 
@@ -42,7 +42,7 @@ fi
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-if [[ -n "$NVIM_LISTEN_ADDRESS" && -x "$(which nvr)" ]]; then
+if [[ -n "$NVIM_LISTEN_ADDRESS" && -x "$(which nvr 2>/dev/null)" ]]; then
     local sp_or_wp="if winnr('\$') == 1 | split | else | wincmd p | endif"
 
     export VISUAL="nvr -cc \"$sp_or_wp\" --remote-wait"
