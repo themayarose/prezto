@@ -32,7 +32,7 @@ elif [[ -x $(which screenfetch 2>/dev/null) ]]; then
 fi
 
 if [[ -x $(which ponysay 2>/dev/null) ]]; then
-    ponysay -b unicode -q
+    [[ $[$RANDOM % 6] == 0 ]] && ponysay -b unicode -q
 fi
 
 if [[ -s "$HOME/.commonrc" ]]; then
