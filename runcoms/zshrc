@@ -6,7 +6,7 @@
 #
 
 if [[ -x $(which tmux 2>/dev/null) && -z "$TMUX" ]]; then
-    tmux attach || tmux new
+    tmux -2 attach || tmux -2 new
     exit 0
 fi
 
