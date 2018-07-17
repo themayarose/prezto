@@ -5,7 +5,8 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
-if [[ -x $(which tmux 2>/dev/null) && -z "$TMUX" ]]; then
+if [[ ! -v NVIM_LISTEN_ADDRESS && -x $(which tmux 2>/dev/null) && -z "$TMUX" ]];
+then
     tmux -2 attach || tmux -2 new
     exit 0
 fi
