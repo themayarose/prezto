@@ -7,7 +7,7 @@
 
 if [[ ! -v NVIM_LISTEN_ADDRESS && -x $(which tmux 2>/dev/null) && -z "$TMUX" ]];
 then
-    tmux -2 attach || tmux -2 new
+    tmux -2 attach -t def || tmux -2 new -s def
     exit 0
 fi
 
