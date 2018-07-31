@@ -46,7 +46,7 @@ function prompt_almost_precmd {
 
 function _set_python_format {
     if [[ -n ${python_info[virtualenv]} ]]; then
-        _python_format=" ${_C[2]}${python_info[virtualenv]}%f${_C[4]}%B∼%b%f"
+        _python_format=" ${_C[2]}${python_info[virtualenv]}%f${_C[4]}%B🐍%b%f"
     else
         _python_format=''
     fi
