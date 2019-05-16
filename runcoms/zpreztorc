@@ -39,7 +39,6 @@ if [[ $(uname -s) =~ "Darwin" ]]; then
     'gnu-utility' \
     'git' \
     'haskell' \
-    'node' \
     'pacman' \
     'python' \
     'rsync' \
@@ -47,6 +46,7 @@ if [[ $(uname -s) =~ "Darwin" ]]; then
     'homebrew' \
     'osx' \
     'completion' \
+    'node' \
     'syntax-highlighting' \
     'history-substring-search' \
     'prompt'
@@ -62,12 +62,12 @@ else
     'gnu-utility' \
     'git' \
     'haskell' \
-    'node' \
     'pacman' \
     'python' \
     'rsync' \
     'ssh' \
     'completion' \
+    'node' \
     'syntax-highlighting' \
     'history-substring-search' \
     'prompt'
