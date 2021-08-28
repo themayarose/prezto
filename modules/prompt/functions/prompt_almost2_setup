@@ -1,0 +1,260 @@
+#
+# A simple theme that displays relevant, contextual information.
+#
+# Authors:
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+# Screenshots:
+#   http://i.imgur.com/nrGV6pg.png
+#
+
+#
+# 16 Terminal Colors
+# -- ---------------
+#  0 black
+#  1 red
+#  2 green
+#  3 yellow
+#  4 blue
+#  5 magenta
+#  6 cyan
+#  7 white
+#  8 bright black
+#  9 bright red
+# 10 bright green
+# 11 bright yellow
+# 12 bright blue
+# 13 bright magenta
+# 14 bright cyan
+# 15 bright white
+#
+
+# Load dependencies.
+pmodload 'helper'
+
+function prompt_almost2_async_callback {
+  case $1 in
+    prompt_almost2_async_git)
+      # We can safely split on ':' because it isn't allowed in ref names.
+      IFS=':' read _git_target _git_post_target <<<"$3"
+
+      # The target actually contains 3 space separated possibilities, so we need to
+      # make sure we grab the first one.
+      _git_target=$(coalesce ${(@)${(z)_git_target}})
+
+      if [[ -z "$_git_target" ]]; then
+        # No git target detected, flush the git fragment and redisplay the prompt.
+        if [[ -n "$_prompt_almost2_git" ]]; then
+          _prompt_almost2_git=''
+          zle && zle reset-prompt
+        fi
+      else
+        # Git target detected, update the git fragment and redisplay the prompt.
+        _prompt_almost2_git="${_git_target}${_git_post_target}"
+        zle && zle reset-prompt
+      fi
+      ;;
+    "[async]")
+      # Code is 1 for corrupted worker output and 2 for dead worker.
+      if [[ $2 -eq 2 ]]; then
+	  # Our worker died unexpectedly.
+          typeset -g prompt_prezto_async_init=0
+      fi
+      ;;
+  esac
+}
+
+function prompt_almost2_async_git {
+  cd -q "$1"
+  if (( $+functions[git-info] )); then
+    git-info
+    print ${git_info[status]}
+  fi
+}
+
+function prompt_almost2_async_tasks {
+  # Initialize async worker. This needs to be done here and not in
+  # prompt_almost2_setup so the git formatting can be overridden by other prompts.
+  if (( !${prompt_prezto_async_init:-0} )); then
+    async_start_worker prompt_almost2 -n
+    async_register_callback prompt_almost2 prompt_almost2_async_callback
+    typeset -g prompt_prezto_async_init=1
+  fi
+
+  # Kill the old process of slow commands if it is still running.
+  async_flush_jobs prompt_almost2
+
+  # Compute slow commands in the background.
+  async_job prompt_almost2 prompt_almost2_async_git "$PWD"
+}
+
+function prompt_almost2_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Format PWD.
+  _prompt_almost2_pwd=$(prompt-pwd)
+
+  if [[ -n "$SSH_TTY" ]]; then
+      host='%M'
+  else
+      host='%m'
+  fi
+
+  left_prompt="${_C[6]}%B→%b%f ${_C[4]}%n%f at ${_C[5]}$host%f in ${_C[1]}${_prompt_almost2_pwd}%f"
+
+  zero='%([BSUbfksu]|([FBK]|){*})'
+  left_width=${#${(S%%)left_prompt//$~zero/}}
+
+  width=$(($COLUMNS-${left_width}-2))
+  time_='${_C[6]}'
+  spacing="${(l:$width:)_C[6]}"
+
+  _set_python_format
+
+  # Handle updating git data. We also clear the git prompt data if we're in a
+  # different git root now.
+  if (( $+functions[git-dir] )); then
+    local new_git_root="$(git-dir 2> /dev/null)"
+    if [[ $new_git_root != $_almost2_cur_git_root ]]; then
+      _prompt_almost2_git=''
+      _almost2_cur_git_root=$new_git_root
+    fi
+  fi
+
+  # Run python info (this should be fast and not require any async)
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+
+  prompt_almost2_async_tasks
+}
+
+function _set_python_format {
+    if [[ -n ${python_info[virtualenv]} ]]; then
+        _python_format=" ${_C[2]}${python_info[virtualenv]}%f${_C[4]}%B🐍%b%f"
+    else
+        _python_format=''
+    fi
+}
+
+function prompt_almost2_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent sp subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+  autoload -Uz async && async
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_almost2_precmd
+
+  # Tell prezto we can manage this prompt
+  zstyle ':prezto:module:prompt' managed 'yes'
+
+# Use extended color pallete if available.
+if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then
+    _C=(
+        "%F{81}"  # Turquoise
+        "%F{166}" # Orange
+        "%F{135}" # Purple
+        "%F{161}" # Hotpink
+        "%F{118}" # Limegreen
+        "%F{239}" # Dark grey
+        "%F{91}" # Dark purple
+        "%F{196}" # Red
+        "%F{250}" # White
+    )
+else
+    _C=(
+        "%F{cyan}"
+        "%F{yellow}"
+        "%F{magenta}"
+        "%F{red}"
+        "%F{green}"
+        "%F{grey}"
+    )
+fi
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ' %F{3}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B%(!.'"${_C[8]}"'#%f.'"${_C[2]}"'§%f)%b'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%(!.'"${_C[8]}"'!%f.'"${_C[2]}"'$%f)%b'
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action' format '%F{7}:%f%%B%F{9}%s%f%%b'
+  zstyle ':prezto:module:git:info:added' format ' %%B%F{2}✚%f%%b'
+  zstyle ':prezto:module:git:info:ahead' format ' %%B%F{13}⬆%f%%b'
+  zstyle ':prezto:module:git:info:behind' format ' %%B%F{13}⬇%f%%b'
+  zstyle ':prezto:module:git:info:branch' format ' %%B%F{2}%b%f%%b'
+  zstyle ':prezto:module:git:info:commit' format ' %%B%F{3}%.7c%f%%b'
+  zstyle ':prezto:module:git:info:deleted' format ' %%B%F{1}✖%f%%b'
+  zstyle ':prezto:module:git:info:modified' format ' %%B%F{4}✱%f%%b'
+  zstyle ':prezto:module:git:info:position' format ' %%B%F{13}%p%f%%b'
+  zstyle ':prezto:module:git:info:renamed' format ' %%B%F{5}➜%f%%b'
+  zstyle ':prezto:module:git:info:stashed' format ' %%B%F{6}✭%f%%b'
+  zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{3}═%f%%b'
+  zstyle ':prezto:module:git:info:untracked' format ' %%B%F{7}◼%f%%b'
+  zstyle ':prezto:module:git:info:keys' format \
+    'status' '%b %p %c:%s%A%B%S%a%d%m%r%U%u'
+
+  # Set python-info parameters.
+  # zstyle ':prezto:module:python:info:virtualenv' format '%f%F{3}(%v)%F{7} '
+    zstyle ':prezto:module:python:info:virtualenv' format '%v'
+
+  # Set up non-zero return value display
+  local show_return="✘ "
+  # Default is to show the return value
+  if zstyle -T ':prezto:module:prompt' show-return-val; then
+    show_return+='%? '
+  fi
+
+  # Get the async worker set up.
+  _almost2_cur_git_root=''
+
+  _prompt_almost2_git=''
+  _prompt_almost2_pwd=''
+
+    if [[ -n "$SSH_TTY" ]]; then
+        host='%M'
+    else
+        host='%m'
+    fi
+
+    PROMPT='
+$left_prompt$spacing%D{%H:%M:%S}%f
+${editor_info[keymap]} '
+
+    RPROMPT=""'${VIM:+"'"$_C[5]"'✱%f"}${_prompt_almost2_git}'""'$_python_format'
+
+  # Define prompts.
+  # PROMPT='${SSH_TTY:+"%F{9}%n%f%F{7}@%f%F{3}%m%f "}%F{4}${_prompt_almost2_pwd}%(!. %B%F{1}#%f%b.)${editor_info[keymap]} '
+  # RPROMPT='$python_info[virtualenv]${editor_info[overwrite]}%(?:: %F{1}'
+  # RPROMPT+=${show_return}
+  # RPROMPT+='%f)${VIM:+" %B%F{6}V%f%b"}${_prompt_almost2_git}'
+  # SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
+  #
+  # zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
+  # zstyle ':prezto:module:editor:info:keymap:primary' format ' %B%F{1}❯%F{3}❯%F{2}❯%f%b'
+  # zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ' %F{3}♺%f'
+  # zstyle ':prezto:module:editor:info:keymap:alternate' format ' %B%F{2}❮%F{3}❮%F{1}❮%f%b'
+
+}
+
+function _set_prompt {
+}
+
+function prompt_almost2_preview {
+  local +h PROMPT=''
+  local +h RPROMPT=''
+  local +h SPROMPT=''
+
+  editor-info 2> /dev/null
+  prompt_preview_theme 'almost2'
+}
+
+prompt_almost2_setup "$@"
+# vim: ft=zsh
