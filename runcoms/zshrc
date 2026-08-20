@@ -26,7 +26,9 @@ fi
 
 # Customize to your needs...
 
-if [[ -x $(which neofetch 2>/dev/null) ]]; then
+if [[ -x $(which fastfetch 2>/dev/null) ]]; then
+    fastfetch
+elif [[ -x $(which neofetch 2>/dev/null) ]]; then
     neofetch
 elif [[ -x $(which screenfetch 2>/dev/null) ]]; then
     screenfetch
